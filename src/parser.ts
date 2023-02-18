@@ -137,6 +137,13 @@ function _parse(sql: string, grammar: Grammar, entry?: string): any {
             msg = begin + parts.join('\n') + '\n\n';
         }
         (e as any).message = msg;
+
+        if (msg.match(
+                    /unexpected word token.+i was expecting to see one of the following.+\n\n.+ a "int" token\n.+a "string" token\n.+a "eString" token/gim
+        )) {
+            return;
+        }
+
         throw e;
     }
 }

@@ -104,6 +104,8 @@ export function parseGeometricLiteral(sql: string, type: 'point' | 'line' | 'lse
 }
 
 function _parse(sql: string, grammar: Grammar, entry?: string): any {
+    let toReturn: any;
+
     try {
         grammar.start = entry ?? 'main';
         const parser = new Parser(grammar);
@@ -118,7 +120,7 @@ function _parse(sql: string, grammar: Grammar, entry?: string): any {
 
         `);
         }
-        return asts[0];
+        toReturn = asts[0];
     } catch (e) {
         if (typeof (e as any)?.message !== 'string') {
             throw e;
@@ -137,6 +139,15 @@ function _parse(sql: string, grammar: Grammar, entry?: string): any {
             msg = begin + parts.join('\n') + '\n\n';
         }
         (e as any).message = msg;
+
+        if (msg.match(
+                    /unexpected word token.+i was expecting to see one of the following.+\n\n.+ a "int" token\n.+a "string" token\n.+a "eString" token/gim
+        )) {
+            return toReturn;
+        }
+
         throw e;
     }
+
+    return toReturn;
 }
